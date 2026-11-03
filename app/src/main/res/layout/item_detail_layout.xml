@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:gravity="center_vertical"
+    android:layout_height="50dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<com.google.android.material.imageview.ShapeableImageView
+    android:layout_centerVertical="true"
+    android:layout_width="20dp"
+    android:layout_height="20dp"
+    app:srcCompat="@drawable/key_fill0_wght700_grad0_opsz48"
+    android:id="@+id/item_imageView"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_centerVertical="true"
+        android:id="@+id/item_textView"
+        android:layout_marginStart="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/item_imageView"
+        android:text="Email:"
+        android:textSize="15sp"
+        android:textStyle="bold"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:text="315678987@qq.com"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="25dp"
+        android:textSize="13sp"
+        android:id="@+id/item_textView_right"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/item_textView" />
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/item_textView_right"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerInsetStart="25dp"
+        app:dividerInsetEnd="2dp"/>
+</RelativeLayout>

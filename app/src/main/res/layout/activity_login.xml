@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<com.google.android.material.circularreveal.CircularRevealRelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.Login">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/image_view"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        app:srcCompat="@drawable/sign_logo" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:textStyle="bold"
+        android:id="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:text="Login"
+        android:textSize="30sp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView"
+        android:layout_marginTop="60dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:hint="Account">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="username"
+            android:inputType="number"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textInputLayout"
+        android:hint="Password"
+        android:layout_margin="20dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="password"
+            android:inputType="textPassword"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textView_forgotPassword"
+        android:layout_marginEnd="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:text="Forgot password?"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/textInputLayout_password"/>
+ <com.google.android.material.button.MaterialButton
+     android:id="@+id/button_signIn"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+    android:layout_below="@id/textView_forgotPassword"
+     android:layout_marginStart="20dp"
+     android:layout_marginEnd="20dp"
+     android:layout_marginTop="60dp"
+     android:text="Sign In"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/textView_createAccount"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/button_signIn"
+        android:textSize="12sp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create account" />
+</com.google.android.material.circularreveal.CircularRevealRelativeLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:layout="@layout/pref_title"
+        android:selectable="false" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:icon="@drawable/apps_fill0_wght700_grad0_opsz48"
+        android:key="switch_preference_autofill"
+        android:title="@string/auto_fill_service" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:enabled="false"
+        android:icon="@drawable/filter_list_fill0_wght700_grad0_opsz48"
+        android:key="switch_preference_compatible_mode"
+        android:summary="@string/compatible_mode_describe_simply"
+        android:title="@string/compatible_mode" />
+
+    <ListPreference
+        android:key="theme_preference"
+        android:title="@string/theme"
+        android:icon="@drawable/routine_fill0_wght700_grad200_opsz48__1_"
+
+        android:entries="@array/theme_options"
+        android:entryValues="@array/theme_values"
+        android:defaultValue="system" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:icon="@drawable/smartphone_fill0_wght700_grad200_opsz48"
+        android:key="switch_preference_shoot_cut"
+        android:summary="@string/prefer_screen_shot_summary"
+        android:title="@string/allow_screen_recording" />
+</PreferenceScreen>
+
+    <!--CheckBoxPreference：复选框，用于开启或关闭某个功能或选项。
+
+    DropDownPreference：下拉框，用于从一个列表中选择一个选项。
+
+    EditTextPreference：文本输入框，用于输入一段文本，比如用户名、密码等。
+
+    ListPreference：列表选择框，用于从一个列表中选择一个选项。
+
+    MultiSelectListPreference：多选列表选择框，用于从一个列表中选择多个选项。
+
+    Preference：偏好设置项的基类，可以用于展示一些文本或图标等内容。
+
+    PreferenceCategory：偏好设置分类，可以将一组相关的偏好设置项放在同一个分类下。
+
+    PreferenceScreen：偏好设置屏幕，用于展示一组偏好设置项。
+
+    SeekBarPreference：滑动条，用于选择一个数值，比如音量大小、亮度等。
+
+    SwitchPreferenceCompat：开关按钮，用于开启或关闭某个功能或选项。-->

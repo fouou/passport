@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/navigation_password_list"
+        android:icon="@drawable/list_fill0_wght700_grad0_opsz48"
+        android:title="@string/passwordlist" />
+
+    <item
+        android:id="@+id/navigation_folder"
+        android:icon="@drawable/folder_fill0_wght700_grad0_opsz48"
+        android:title="@string/categories" />
+
+    <item
+        android:id="@+id/navigation_dialpad"
+        android:icon="@drawable/filter_list_fill0_wght700_grad0_opsz48"
+        android:title="@string/pin" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/settings_fill0_wght700_grad0_opsz48"
+        android:title="@string/settings" />
+
+</menu>

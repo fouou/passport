@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8" ?><!--
+  These browsers work using the compatibility shim for the Autofill Framework
+  (and need to be listed here as well)
+
+  Be sure:
+    - to keep these entries sorted alphabetically,
+    - to keep this list in sync with values in AutofillHelpers.CompatBrowsers, and
+
+    - ... to keep this list in sync with values in AccessibilityHelpers.SupportedBrowsers [Section A], too.
+  -->
+<!--alook.browser - Alook浏览器
+com.amazon.cloud9 - 亚马逊云浏览器
+com.android.browser - Android浏览器
+com.android.chrome - Google Chrome浏览器
+com.android.htmlviewer - HTML查看器
+com.avast.android.secure.browser - Avast安全浏览器
+com.avg.android.secure.browser - AVG安全浏览器
+com.brave.browser - Brave浏览器
+com.brave.browser_beta - Brave浏览器Beta版
+com.brave.browser_default - Brave浏览器默认版
+com.brave.browser_dev - Brave浏览器开发版
+com.brave.browser_nightly - Brave浏览器夜间版
+com.chrome.beta - Google Chrome浏览器Beta版
+com.chrome.canary - Google Chrome浏览器Canary版
+com.chrome.dev - Google Chrome浏览器开发版
+com.cookiegames.smartcookie - SmartCookie浏览器
+com.cookiejarapps.android.smartcookieweb - SmartCookie浏览器Web版
+com.ecosia.android - Ecosia浏览器
+com.google.android.apps.chrome - Google Chrome浏览器
+com.google.android.apps.chrome_dev - Google Chrome浏览器Dev版
+com.jamal2367.styx - Styx浏览器
+com.kiwibrowser.browser - Kiwi浏览器
+com.microsoft.emmx - Microsoft Edge浏览器
+com.microsoft.emmx.beta - Microsoft Edge浏览器Beta版
+com.microsoft.emmx.canary - Microsoft Edge浏览器Canary版
+com.microsoft.emmx.dev - Microsoft Edge浏览器开发版
+com.mmbox.browser - MM浏览器
+com.mmbox.xbrowser - X浏览器
+com.mycompany.app.soulbrowser - Soul浏览器
+com.naver.whale - Naver Whale浏览器
+com.opera.browser - Opera浏览器
+com.opera.browser.beta - Opera浏览器Beta版
+com.opera.mini.native - Opera Mini浏览器
+com.opera.mini.native.beta - Opera Mini浏览器Beta版
+com.opera.touch - Opera Touch浏览器
+com.qwant.liberty - Qwant浏览器
+com.sec.android.app.sbrowser - Samsung Internet浏览器
+com.sec.android.app.sbrowser.beta - Samsung Internet浏览器Beta版
+com.stoutner.privacybrowser.free - 隐私浏览器
+com.stoutner.privacybrowser.standard - 隐私浏览器标准版
+com.vivaldi.browser - Vivaldi浏览器
+com.vivaldi.browser.snapshot - Vivaldi浏览器快照版
+com.vivaldi.browser.sopranos - Vivaldi浏览器Sopranos版
+com.yandex.browser - Yandex浏览器
+com.z28j.feel - Feel浏览器
+idm.internet.download.manager - IDM下载管理器
+idm.internet.download.manager.adm.lite - IDM下载管理器Lite版
+idm.internet.download.manager.plus - IDM下载管理器Plus版
+io.github.forkmaintainers.iceraven - IceRaven浏览器
+mark.via - Via浏览器
+mark.via.gp - Via浏览器Google Play版
+net.slions.fulguris.full.download - Fulguris浏览器完整版
+net.slions.fulguris.full.download.debug - Fulguris浏览器完整版Debug版
+net.slions.fulguris.full.playstore - Fulguris浏览器完整版Play Store版
+net.slions.fulguris.full.playstore.debug - Fulguris浏览器完整版Play Store版Debug版
+org.adblockplus.browser - Adblock Plus浏览器
+org.adblockplus.browser.beta - Adblock Plus浏览器Beta版
+org.bromite.bromite - Bromite浏览器
+org.bromite.chromium - Bromite浏览器Chromium版
+org.chromium.chrome - Chromium浏览器
+org.codeaurora.swe.browser - CodeAurora浏览器
+org.gnu.icecat - IceCat浏览器
+org.mozilla.fenix - Fenix浏览器
+org.mozilla.fenix.nightly - Fenix浏览器夜间版
+org.mozilla.fennec_aurora - Fennec浏览器Aurora版
+org.mozilla.fennec_fdroid - Fennec浏览器FDroid版
+org.mozilla.firefox - Firefox浏览器
+org.mozilla.firefox_beta - Firefox浏览器Beta版
+org.mozilla.reference.browser - 参考浏览器
+org.mozilla.rocket - Firefox Rocket浏览器
+org.torproject.torbrowser - Tor浏览器
+org.torproject.torbrowser_alpha - Tor浏览器Alpha版
+org.ungoogled.chromium.extensions.stable - 不谷化Chromium浏览器扩展稳定版
+org.ungoogled.chromium.stable - 不谷化Chromium浏览器稳定版
+us.spotco.fennec_dos - Fennec浏览器DOS版
+com.huawei.browser - 华为浏览器-->
+
+<autofill-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:supportsInlineSuggestions="true">
+    <compatibility-package
+        android:name="alook.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.amazon.cloud9"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.android.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.android.chrome"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.android.htmlviewer"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.avast.android.secure.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.avg.android.secure.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.brave.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.brave.browser_beta"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.brave.browser_default"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.brave.browser_dev"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.brave.browser_nightly"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.chrome.beta"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.chrome.canary"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.chrome.dev"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.cookiegames.smartcookie"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.cookiejarapps.android.smartcookieweb"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.ecosia.android"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.google.android.apps.chrome"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.google.android.apps.chrome_dev"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.jamal2367.styx"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.kiwibrowser.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.microsoft.emmx"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.microsoft.emmx.beta"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.microsoft.emmx.canary"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.microsoft.emmx.dev"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.mmbox.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.mmbox.xbrowser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.mycompany.app.soulbrowser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.naver.whale"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.opera.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.opera.browser.beta"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.opera.mini.native"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.opera.mini.native.beta"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.opera.touch"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.qwant.liberty"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.sec.android.app.sbrowser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.sec.android.app.sbrowser.beta"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.stoutner.privacybrowser.free"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.stoutner.privacybrowser.standard"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.vivaldi.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.vivaldi.browser.snapshot"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.vivaldi.browser.sopranos"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.yandex.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.z28j.feel"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="idm.internet.download.manager"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="idm.internet.download.manager.adm.lite"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="idm.internet.download.manager.plus"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="io.github.forkmaintainers.iceraven"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="mark.via"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="mark.via.gp"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="net.slions.fulguris.full.download"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="net.slions.fulguris.full.download.debug"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="net.slions.fulguris.full.playstore"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="net.slions.fulguris.full.playstore.debug"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.adblockplus.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.adblockplus.browser.beta"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.bromite.bromite"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.bromite.chromium"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.chromium.chrome"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.codeaurora.swe.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.gnu.icecat"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.mozilla.fenix"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.mozilla.fenix.nightly"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.mozilla.fennec_aurora"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.mozilla.fennec_fdroid"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.mozilla.firefox"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.mozilla.firefox_beta"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.mozilla.reference.browser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.mozilla.rocket"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.torproject.torbrowser"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.torproject.torbrowser_alpha"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.ungoogled.chromium.extensions.stable"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="org.ungoogled.chromium.stable"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="us.spotco.fennec_dos"
+        android:maxLongVersionCode="10000000000" />
+    <compatibility-package
+        android:name="com.huawei.browser"
+        android:maxLongVersionCode="10000000000" />
+</autofill-service>
