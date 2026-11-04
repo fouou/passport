@@ -16,8 +16,6 @@
 package com.fou.passport.service;
 import android.widget.RemoteViews;
 
-import androidx.annotation.DrawableRes;
-
 import com.fou.passport.R;
 
 /**
@@ -28,19 +26,17 @@ public final class RemoteViewsHelper {
     }
 
     public static RemoteViews viewsWithAuth(String packageName, String text) {
-        return simpleRemoteViews(packageName, text, R.drawable.lock_fill0_wght700_grad0_opsz48);
+        return simpleRemoteViews(packageName, text);
     }
 
     public static RemoteViews viewsWithNoAuth(String packageName, String text) {
-        return simpleRemoteViews(packageName, text, R.drawable.lock_open_right_fill0_wght700_grad0_opsz48);
+        return simpleRemoteViews(packageName, text);
     }
 
-    private static RemoteViews simpleRemoteViews(String packageName, String remoteViewsText,
-            @DrawableRes int drawableId) {
+    private static RemoteViews simpleRemoteViews(String packageName, String remoteViewsText) {
         RemoteViews presentation = new RemoteViews(packageName,
                 R.layout.multidataset_service_list_item);
         presentation.setTextViewText(R.id.text, remoteViewsText);
-        presentation.setImageViewResource(R.id.icon, drawableId);
         return presentation;
     }
 }

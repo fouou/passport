@@ -123,17 +123,14 @@ public class MyAutofillService2 extends AutofillService {
             @Override
             public void hasDataset(List<DatasetAndMetadata> datasetAndMetadataList) {
                 FillResponse fillResponse = responseAdapter.buildFillResponse(datasetAndMetadataList, MyAutofillService2.this);
-                if (fillResponse != null) {
-                    callback.onSuccess(fillResponse);
-                }
+                //即使没有可用数据集也要回调，否则系统会一直等待填充服务响应
+                callback.onSuccess(fillResponse);
             }
 
             @Override
             public void noDataset() {
                 FillResponse fillResponse = responseAdapter.buildFillResponseNoDataset(MyAutofillService2.this);
-                if (fillResponse != null) {
-                    callback.onSuccess(fillResponse);
-                }
+                callback.onSuccess(fillResponse);
             }
         });
     }
@@ -181,9 +178,7 @@ public class MyAutofillService2 extends AutofillService {
         }
 //是web，没有数据
         FillResponse fillResponse = responseAdapter.buildFillResponseNoDataset(MyAutofillService2.this);
-        if (fillResponse != null) {
-            callback.onSuccess(fillResponse);
-        }
+        callback.onSuccess(fillResponse);
     }
 
 

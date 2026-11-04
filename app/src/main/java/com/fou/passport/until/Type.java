@@ -105,22 +105,36 @@ public class Type {
         }
         // 获取输入框的提示信息、输入类型和Autofill Hints
         String hint = node.getHint() != null ? node.getHint().toLowerCase().replace(" ", "") : "";
+        //短信验证码/图形验证码等一次性代码不参与保存与填充，
+        //必须最先判断，否则像“手机验证码”这类 hint 会因包含“手机”被误判为手机号
+        if (hint.contains("验证码") || hint.contains("校验码") || hint.contains("动态码")
+                || hint.contains("verification") || hint.contains("verifycode")
+                || hint.contains("smscode") || hint.contains("authcode")
+                || hint.contains("captcha") || hint.contains("otp")) {
+            return null;
+        }
         int inputType = node.getInputType();
+        //inputType 是“类别 + 变体 + 标志位”的位组合，必须按掩码取出后精确比较；
+        //直接与变体常量做按位与会把多行文本等其它变体误判为密码框（如 0x50 & 0x10 命中）
+        int inputClass = inputType & InputType.TYPE_MASK_CLASS;
+        int variation = inputType & InputType.TYPE_MASK_VARIATION;
         String[] autofillHints = node.getAutofillHints() != null ? node.getAutofillHints() : new String[0];
         List<String> autofillHintList = Arrays.asList(autofillHints);
         // 判断输入框类型
         if (autofillHintList.contains(View.AUTOFILL_HINT_PASSWORD)
-                || (inputType & InputType.TYPE_TEXT_VARIATION_PASSWORD) !=0 // 判断是否为密码输入框
-                || (inputType & InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) !=0 // 判断是否为密码输入框
-                || (inputType & InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD) !=0 // 判断是否为密码输入框
-                || (inputType &  InputType.TYPE_NUMBER_VARIATION_PASSWORD)!=0) { // 判断是否为密码输入框
+                || (inputClass == InputType.TYPE_CLASS_TEXT
+                    && (variation == InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        || variation == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                        || variation == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD))
+                || (inputClass == InputType.TYPE_CLASS_NUMBER
+                    && variation == InputType.TYPE_NUMBER_VARIATION_PASSWORD)) {
             // 处理密码输入框
             return PASSWORD;
         } else if (isUserName(hint, autofillHintList)) {
             //处理账户输入框
             return USERNAME;
         } else if (autofillHintList.contains(View.AUTOFILL_HINT_PHONE)
-                || (inputType & InputType.TYPE_CLASS_PHONE) !=0
+                || inputClass == InputType.TYPE_CLASS_PHONE
                 || hint.contains("phone") // 判断是否为电话号码输入框
                 || hint.contains("mobile")
                 || hint.contains("手机")
@@ -128,8 +142,9 @@ public class Type {
             // 处理电话号码输入框
             return PHONE;
         } else if (autofillHintList.contains(View.AUTOFILL_HINT_EMAIL_ADDRESS)
-                || (inputType & InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS) !=0
-                || (inputType & InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS)!=0
+                || (inputClass == InputType.TYPE_CLASS_TEXT
+                    && (variation == InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+                        || variation == InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS))
                 || hint.contains("email")
                 || hint.contains("邮箱")) {
             // 处理邮箱输入框

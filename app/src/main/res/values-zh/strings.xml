@@ -63,4 +63,6 @@
     <string name="switch_theme">设置主题</string>
     <string name="prefer_screen_shot_summary">开启后仅对本次启动有效</string>
     <string name="allow_screen_recording">允许应用内截录屏</string>
+    <string name="save_custom_title">保存到 Passport</string>
+    <string name="save_custom_subtitle">账号信息将加密保存在本机</string>
 </resources>

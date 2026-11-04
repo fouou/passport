@@ -80,7 +80,9 @@ public class DatasetAdapter {
     private void autofillForNotEdittext(DatasetAndMetadata datasetAndMetadata, Dataset.Builder builder, AssistStructure.ViewNode node) {
         if (node.getId()!=-1) {
             for (MetadataEntity metadataEntity : datasetAndMetadata.metadataEntityList) {
-                if (node.getId()==metadataEntity.xml_id) {
+                //资源 id 跨页面可能重复，必须同时校验自动填充类型一致，
+                //否则任意页面的开关/下拉等控件会因 id 碰撞被无关数据填充，导致到处弹建议
+                if (node.getId()==metadataEntity.xml_id && node.getAutofillType() == metadataEntity.auto_fill_type) {
                     if (setValueToDatasetBuilder(node, metadataEntity, builder)) {
                         isAtLeastSetValue = true;//dataset add a value
                     }
@@ -218,6 +220,8 @@ public class DatasetAdapter {
                     builder.setValue(autofillId, AutofillValue.forText(textValue));
                     return true;
                 }
+                //text 为空直接返回，不能穿透到 toggle 分支（否则会把文本框当开关填）
+                return false;
             case View.AUTOFILL_TYPE_TOGGLE:
                 boolean toggleValue = metadataEntity.auto_fill_value_toggle;
                 builder.setValue(autofillId, AutofillValue.forToggle(toggleValue));

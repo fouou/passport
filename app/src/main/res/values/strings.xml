@@ -63,4 +63,6 @@
     <string name="switch_theme">Switch theme</string>
     <string name="prefer_screen_shot_summary">Only effective for the current session after being enabled.</string>
     <string name="allow_screen_recording">"Allow in-app screen recording"</string>
+    <string name="save_custom_title">Save to Passport</string>
+    <string name="save_custom_subtitle">Account info will be stored encrypted on this device</string>
 </resources>

@@ -163,10 +163,12 @@ public class SaveDataToDatabase {
      * @param node
      */
     private void parseNodeAboutEditText(PackageEntity packageEntity, DatasetEntity datasetEntity, List<MetadataEntity> metadataEntityList, AssistStructure.ViewNode node) {
-        if (!"".equals(node.getAutofillValue().getTextValue().toString().trim())) {//不保存无用的
+        String text = node.getAutofillValue().getTextValue().toString().trim();
+        if (!"".equals(text)) {//不保存无用的
             String key = Type.getKey(node);
             if (key != null) {
-                metadataEntityList.add(new MetadataEntity(key, node.getId(), node.getAutofillType(), node.getAutofillValue().getTextValue().toString(), false, null, 0, datasetEntity.id, packageEntity.id));
+                //统一存去除首尾空格后的文本，避免展示和填充时带着不可见空格
+                metadataEntityList.add(new MetadataEntity(key, node.getId(), node.getAutofillType(), text, false, null, 0, datasetEntity.id, packageEntity.id));
             }
         }
     }
