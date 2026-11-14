@@ -1,13 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 自动填充建议弹窗的条目样式：仅一行账号文本，样式交给系统容器渲染，避免自定义背景叠加 -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/text"
+<!-- 填充建议条目：应用图标 + 账号 + 副标题，样式接近 1Password/Bitwarden 等密码管理器的两行式建议 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:maxLines="1"
-    android:ellipsize="end"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"
-    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-    android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+    android:minHeight="56dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/app_ic" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/autofill_text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/autofill_item_auth_required"
+            android:textColor="@color/autofill_text_secondary"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

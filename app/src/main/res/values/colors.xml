@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="gray">#D5D5D5</color>
-    <color name="nav_bottom">#1f1f1f</color>
-    <color name="blue">#03A9F4</color>
     <color name="icon_lock">#000000</color>
+    <!-- RemoteViews 弹窗文字色：RemoteViews 不能使用主题属性，这里用可随夜间模式切换的颜色资源 -->
+    <color name="autofill_text_primary">#E6000000</color>
+    <color name="autofill_text_secondary">#8A000000</color>
 
 <!--material3-->
         <color name="seed">#333333</color>
@@ -44,6 +37,13 @@
         <color name="md_theme_light_surfaceTint">#757575</color>
         <color name="md_theme_light_outlineVariant">#BFC8CA</color>
         <color name="md_theme_light_scrim">#000000</color>
+        <color name="md_theme_light_surfaceDim">#E0E0E0</color>
+        <color name="md_theme_light_surfaceBright">#FBFBFB</color>
+        <color name="md_theme_light_surfaceContainerLowest">#FFFFFF</color>
+        <color name="md_theme_light_surfaceContainerLow">#F5F5F5</color>
+        <color name="md_theme_light_surfaceContainer">#EFEFEF</color>
+        <color name="md_theme_light_surfaceContainerHigh">#E9E9E9</color>
+        <color name="md_theme_light_surfaceContainerHighest">#E3E3E3</color>
 
 
         <color name="md_theme_dark_primary">#C5C5C5</color>
@@ -76,4 +76,11 @@
         <color name="md_theme_dark_surfaceTint">#E1E1E1</color>
         <color name="md_theme_dark_outlineVariant">#484848</color>
         <color name="md_theme_dark_scrim">#1B1B1B</color>
+        <color name="md_theme_dark_surfaceDim">#141414</color>
+        <color name="md_theme_dark_surfaceBright">#393939</color>
+        <color name="md_theme_dark_surfaceContainerLowest">#0C0C0C</color>
+        <color name="md_theme_dark_surfaceContainerLow">#1B1B1B</color>
+        <color name="md_theme_dark_surfaceContainer">#1F1F1F</color>
+        <color name="md_theme_dark_surfaceContainerHigh">#2A2A2A</color>
+        <color name="md_theme_dark_surfaceContainerHighest">#363636</color>
     </resources>

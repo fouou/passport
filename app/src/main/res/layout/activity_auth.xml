@@ -1,36 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:visibility="gone"
+    android:background="?attr/colorSurfaceVariant"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
     tools:context=".ui.AuthActivity">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_marginTop="40dp"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:hint="@string/passport_login">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="48dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="32dp">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/password"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:contentDescription="@string/app_name"
+            android:scaleType="centerCrop"
+            android:src="@drawable/app_ic"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Passport.Rounded" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="@string/unlock_passport"
+            android:textAppearance="@style/PassportScreenTitle" />
+
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/unlock_to_fill"
+            android:textAppearance="@style/PassportCaption" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/ok"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/ok" />
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/credential_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/cancel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/cancel" />
-</androidx.appcompat.widget.LinearLayoutCompat>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/password_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/password"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
+                        android:importantForAutofill="no"
+                        android:inputType="textPassword"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/pattern_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="@string/draw_pattern_to_unlock"
+                    android:textAppearance="@style/PassportCaption"
+                    android:visibility="gone" />
+
+                <com.fou.passport.ui.widget.PatternLockView
+                    android:id="@+id/pattern_lock"
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/switch_mode"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/unlock_with_password"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ok"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/ok" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/cancel"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/cancel" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

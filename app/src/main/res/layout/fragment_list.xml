@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:layout_marginStart="5dp"
-            android:text="Password"
+            android:text="@string/app_name"
             android:textSize="40sp"
             android:textStyle="bold" />
 
@@ -46,5 +46,30 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </com.google.android.material.search.SearchView>
+
+    <LinearLayout
+        android:id="@+id/empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:alpha="0.6"
+            app:srcCompat="@drawable/list_fill0_wght700_grad0_opsz48"
+            app:tint="?attr/colorOnSurfaceVariant" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="@string/list_empty"
+            android:textAppearance="@style/PassportFieldValue" />
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

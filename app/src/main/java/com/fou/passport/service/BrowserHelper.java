@@ -25,7 +25,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 public class BrowserHelper {
-    String[] browsers = {
+    private static final String[] BROWSERS = {
             "alook.browser",
             "com.amazon.cloud9",
             "com.android.browser",
@@ -102,6 +102,21 @@ public class BrowserHelper {
             "org.ungoogled.chromium.stable",
             "us.spotco.fennec_dos",
             "com.huawei.browser"};
+
+    /**
+     * 是否为需要兼容模式处理的浏览器。
+     */
+    public static boolean isBrowser(String packageName) {
+        if (packageName == null) {
+            return false;
+        }
+        for (String browser : BROWSERS) {
+            if (browser.equals(packageName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static void delete(String package_name){
         try {

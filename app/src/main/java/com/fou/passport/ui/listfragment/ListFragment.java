@@ -1,11 +1,15 @@
 package com.fou.passport.ui.listfragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +26,7 @@ import com.fou.passport.MyApplication;
 import com.fou.passport.R;
 import com.fou.passport.room.MyDB;
 import com.fou.passport.room.PackageEntity;
+import com.fou.passport.ui.BaseActivity;
 import com.fou.passport.ui.newitem.NewItem;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
@@ -40,6 +45,9 @@ public class ListFragment extends Fragment {
     private List<PackageEntity> packageEntityList_all;
     private SearchView searchView;
     private ListAdapter listAdapter;
+    private View emptyView;
+    private View rootView;
+    private BroadcastReceiver databaseChangedReceiver;
 
     public ListFragment() {
         // Required empty public constructor
@@ -70,10 +78,11 @@ public class ListFragment extends Fragment {
      * 再按一次退出
      */
     private long millis;
+    private OnBackPressedCallback backPressedCallback;
 
     private void doubleClickBack() {
-        // 创建一个OnBackPressedCallback对象
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        // 创建一个OnBackPressedCallback对象，只在当前页可见时启用
+        backPressedCallback = new OnBackPressedCallback(false) {
             @Override
             public void handleOnBackPressed() {
                 if (searchView != null && searchView.isShowing()) {//收起searchview
@@ -87,9 +96,8 @@ public class ListFragment extends Fragment {
             }
         };
         // 将OnBackPressedCallback对象添加到Fragment的OnBackPressedDispatcher中
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, backPressedCallback);
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,10 +105,9 @@ public class ListFragment extends Fragment {
         searchView = view.findViewById(R.id.search_view);//返回收缩
         SearchBar searchBar = view.findViewById(R.id.search_bar);
         searchBar.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.menu_listFragment_add:
-                    getActivity().startActivity(new Intent(getActivity(), NewItem.class));
-                    return true;
+            if (item.getItemId() == R.id.menu_listFragment_add) {
+                getActivity().startActivity(new Intent(getActivity(), NewItem.class));
+                return true;
             }
             return false;
         });
@@ -111,17 +118,20 @@ public class ListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        rootView = view;
+        emptyView = view.findViewById(R.id.empty_view);
+        registerDatabaseChangedReceiver();
         MyApplication.appExecutors.diskIO().execute(() -> {
             packageEntityList_all = MyDB.getDb().getPackageDao().getPackageEntityList();
             MyApplication.appExecutors.mainThread().execute(() -> {
+                updateEmptyView();
                 if (packageEntityList_all.isEmpty()) {
-                    //TODO Empty view
-                }else {
-                    //item_list
-                    setItemList(view);
-                    //searchView
-                    setSearchView(view);
+                    return;
                 }
+                //item_list
+                setItemList(view);
+                //searchView
+                setSearchView(view);
             });
         });
     }
@@ -175,27 +185,109 @@ public class ListFragment extends Fragment {
     }
 
     /**
+     * 列表没有数据时显示本页导航图标和一行提示文字
+     */
+    private void updateEmptyView() {
+        if (emptyView == null) {
+            return;
+        }
+        boolean empty = packageEntityList_all == null || packageEntityList_all.isEmpty();
+        emptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
+    }
+
+    private void registerDatabaseChangedReceiver() {
+        databaseChangedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                reloadList();
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(BaseActivity.ACTION_DATABASE_CHANGED);
+        ContextCompat.registerReceiver(requireContext(), databaseChangedReceiver, intentFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
+    }
+
+    /**
+     * 备份导入等数据库变更后重新读取列表
+     */
+    private void reloadList() {
+        MyApplication.appExecutors.diskIO().execute(() -> {
+            List<PackageEntity> latest = MyDB.getDb().getPackageDao().getPackageEntityList();
+            MyApplication.appExecutors.mainThread().execute(() -> {
+                if (rootView == null) {
+                    return;
+                }
+                if (packageEntityList_all == null) {
+                    packageEntityList_all = new ArrayList<>(latest);
+                } else {
+                    packageEntityList_all.clear();
+                    packageEntityList_all.addAll(latest);
+                }
+                if (listAdapter == null) {
+                    if (!packageEntityList_all.isEmpty()) {
+                        setItemList(rootView);
+                        setSearchView(rootView);
+                    }
+                } else {
+                    listAdapter.notifyDataSetChanged();
+                }
+                updateEmptyView();
+            });
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (databaseChangedReceiver != null && getContext() != null) {
+            getContext().unregisterReceiver(databaseChangedReceiver);
+        }
+        databaseChangedReceiver = null;
+        rootView = null;
+    }
+
+    /**
      * 刷新
      */
     @Override
     public void onResume() {
         super.onResume();
-        if (packageEntityList_all==null || listAdapter==null) {
+        if (backPressedCallback != null) {
+            backPressedCallback.setEnabled(true);
+        }
+        if (packageEntityList_all == null) {
             return;
         }
         MyApplication.appExecutors.diskIO().execute(() -> {
             List<PackageEntity> packageEntityList_all_resume = MyDB.getDb().getPackageDao().getPackageEntityList();
             MyApplication.appExecutors.mainThread().execute(() -> {
-                if (packageEntityList_all_resume.isEmpty()) {
-                    //TODO empty view
+                if (rootView == null) {
                     return;
+                }
+                packageEntityList_all.clear();
+                packageEntityList_all.addAll(packageEntityList_all_resume);
+                if (packageEntityList_all.isEmpty()) {
+                    if (listAdapter != null) {
+                        listAdapter.notifyDataSetChanged();
+                    }
+                } else if (listAdapter == null) {
+                    setItemList(rootView);
+                    setSearchView(rootView);
                 } else {
-                    packageEntityList_all.clear();
-                    packageEntityList_all.addAll(packageEntityList_all_resume);
                     listAdapter.notifyDataSetChanged();
                 }
+                updateEmptyView();
             });
         });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //离开列表页后交还返回键，避免在其它页面被“再按一次退出”拦截
+        if (backPressedCallback != null) {
+            backPressedCallback.setEnabled(false);
+        }
     }
 }
 

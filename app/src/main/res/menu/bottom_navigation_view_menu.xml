@@ -13,11 +13,6 @@
         android:title="@string/categories" />
 
     <item
-        android:id="@+id/navigation_dialpad"
-        android:icon="@drawable/filter_list_fill0_wght700_grad0_opsz48"
-        android:title="@string/pin" />
-
-    <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/settings_fill0_wght700_grad0_opsz48"
         android:title="@string/settings" />

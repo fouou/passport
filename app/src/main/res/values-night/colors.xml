@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="icon_lock">#FFFFFF</color>
+    <color name="autofill_text_primary">#E6FFFFFF</color>
+    <color name="autofill_text_secondary">#8AFFFFFF</color>
 </resources>

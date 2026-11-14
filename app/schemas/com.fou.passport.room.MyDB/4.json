@@ -1,0 +1,196 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "e57b36d38d295950d96db6812187d99f",
+    "entities": [
+      {
+        "tableName": "package_entity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `application_id` TEXT, `certificates_hash` TEXT, `app_name` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "application_id",
+            "columnName": "application_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "certificates_hash",
+            "columnName": "certificates_hash",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "app_name",
+            "columnName": "app_name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "dataset_entity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `package_id` INTEGER NOT NULL, FOREIGN KEY(`package_id`) REFERENCES `package_entity`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "package_id",
+            "columnName": "package_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_dataset_entity_package_id",
+            "unique": false,
+            "columnNames": [
+              "package_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dataset_entity_package_id` ON `${TABLE_NAME}` (`package_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "package_entity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "package_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "meta_data_entity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `xml_id` INTEGER NOT NULL, `auto_fill_type` INTEGER NOT NULL, `auto_fill_value_text` TEXT, `auto_fill_value_toggle` INTEGER NOT NULL, `auto_fill_value_list` TEXT, `auto_fill_value_date` INTEGER NOT NULL, `dataset_id` INTEGER NOT NULL, `package_id` INTEGER NOT NULL, `key_word` TEXT, FOREIGN KEY(`dataset_id`) REFERENCES `dataset_entity`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "xml_id",
+            "columnName": "xml_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "auto_fill_type",
+            "columnName": "auto_fill_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "auto_fill_value_text",
+            "columnName": "auto_fill_value_text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "auto_fill_value_toggle",
+            "columnName": "auto_fill_value_toggle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "auto_fill_value_list",
+            "columnName": "auto_fill_value_list",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "auto_fill_value_date",
+            "columnName": "auto_fill_value_date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataset_id",
+            "columnName": "dataset_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "package_id",
+            "columnName": "package_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "key_word",
+            "columnName": "key_word",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_meta_data_entity_dataset_id",
+            "unique": false,
+            "columnNames": [
+              "dataset_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meta_data_entity_dataset_id` ON `${TABLE_NAME}` (`dataset_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "dataset_entity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dataset_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e57b36d38d295950d96db6812187d99f')"
+    ]
+  }
+}

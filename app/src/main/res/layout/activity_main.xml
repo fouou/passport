@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".ui.MainActivity">
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerView"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomNavigationView"/>
@@ -15,7 +15,6 @@
         android:id="@+id/bottomNavigationView"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        app:itemHorizontalTranslationEnabled="true"
         app:labelVisibilityMode="selected"
         android:layout_alignParentBottom="true"
         android:background="@android:color/transparent"

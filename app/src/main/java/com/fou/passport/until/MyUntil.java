@@ -39,6 +39,6 @@ public class MyUntil {
         }
         List<String> list = new ArrayList<>(stringSet);
         Collections.sort(list);
-        return String.join(" ", list);//字符串之间用空格相连
+        return android.text.TextUtils.join(" ", list);//字符串之间用空格相连
     }
 }

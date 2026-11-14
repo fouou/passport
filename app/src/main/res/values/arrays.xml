@@ -1,13 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="theme_options">
-        <item>跟随系统</item>
-        <item>暗夜模式</item>
-        <item>白天模式</item>
+        <item>@string/theme_follow_system</item>
+        <item>@string/theme_dark</item>
+        <item>@string/theme_light</item>
     </string-array>
     <string-array name="theme_values">
         <item>system</item>
         <item>dark</item>
         <item>light</item>
+    </string-array>
+    <string-array name="language_entries">
+        <item>@string/language_system</item>
+        <item>@string/language_zh</item>
+        <item>@string/language_zh_tw</item>
+        <item>@string/language_en</item>
+        <item>@string/language_ja</item>
+        <item>@string/language_ko</item>
+        <item>@string/language_es</item>
+        <item>@string/language_fr</item>
+        <item>@string/language_de</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>system</item>
+        <item>zh</item>
+        <item>zh-TW</item>
+        <item>en</item>
+        <item>ja</item>
+        <item>ko</item>
+        <item>es</item>
+        <item>fr</item>
+        <item>de</item>
     </string-array>
 </resources>

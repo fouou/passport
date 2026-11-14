@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="whiteTextColor">
-        <item name="android:textColor">@color/white</item>
+    <!-- M3 排版：页面标题/正文统一使用 Material3 文字外观 -->
+    <style name="PassportScreenTitle" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="blackBackground">
-        <item name="android:background">@color/black</item>
+    <style name="PassportPageTitle" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="PassportSectionTitle" parent="TextAppearance.Material3.TitleLarge" />
+
+    <style name="PassportFieldLabel" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="PassportFieldValue" parent="TextAppearance.Material3.BodyMedium" />
+
+    <style name="PassportCaption" parent="TextAppearance.Material3.LabelMedium" />
+
+    <!-- 方形带圆角的图标裁剪 -->
+    <style name="ShapeAppearance.Passport.Rounded" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
     </style>
 </resources>

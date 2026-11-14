@@ -11,6 +11,7 @@ import com.fou.passport.R;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -92,6 +93,44 @@ public class Type {
     }
 
     /**
+     * 账号类字段：可跨应用通用填充的字段。
+     */
+    public static boolean isIdentityKey(String keyWord) {
+        return USERNAME.equals(keyWord) || PHONE.equals(keyWord)
+                || EMAIL.equals(keyWord);
+    }
+
+    /**
+     * 银行卡类字段：银行卡号、CVV、开户银行，可跨应用通用填充，但绝不包含密码。
+     */
+    public static boolean isCardKey(String keyWord) {
+        return CARD.equals(keyWord) || CVV.equals(keyWord)
+                || OTHER_ISSUING_BANK.equals(keyWord);
+    }
+
+    public static boolean isEmailValue(String value) {
+        return value != null && normalizeValue(value)
+                .matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
+    }
+
+    public static boolean isPhoneValue(String value) {
+        return value != null && normalizeValue(value).matches("1[3-9]\\d{9}");
+    }
+
+    /**
+     * 统一账号值的比较格式：去掉空格/横线，手机号去掉 +86 国家码。
+     */
+    public static String normalizeValue(String value) {
+        String normalized = value.replace(" ", "").replace("-", "").trim();
+        if (normalized.startsWith("+86")) {
+            normalized = normalized.substring(3);
+        } else if (normalized.length() == 13 && normalized.startsWith("86")) {
+            normalized = normalized.substring(2);
+        }
+        return normalized;
+    }
+
+    /**
      * 获取每个输入框的填充类型
      *
      * @param node
@@ -103,23 +142,36 @@ public class Type {
         if (node.getAutofillType() != View.AUTOFILL_TYPE_TEXT) {
             return null;//如果不是输入框，直接返回（用到了hint,inputType等edittext专有属性）
         }
+        return getKeyByHint(node.getHint(), node.getInputType(), node.getAutofillHints());
+    }
+
+    /**
+     * 与 {@link #getKey(AssistStructure.ViewNode)} 等价的纯函数版本，便于单元测试。
+     *
+     * @param hint          输入框提示信息，可为空
+     * @param inputType     EditText 的 inputType
+     * @param autofillHints Autofill Hints，可为空
+     * @return 字段类型；不是可填充的输入框时返回 null
+     */
+    public static String getKeyByHint(String hint, int inputType, String[] autofillHints) {
         // 获取输入框的提示信息、输入类型和Autofill Hints
-        String hint = node.getHint() != null ? node.getHint().toLowerCase().replace(" ", "") : "";
+        String normalizedHint = hint != null
+                ? hint.toLowerCase(Locale.ROOT).replace(" ", "") : "";
         //短信验证码/图形验证码等一次性代码不参与保存与填充，
         //必须最先判断，否则像“手机验证码”这类 hint 会因包含“手机”被误判为手机号
-        if (hint.contains("验证码") || hint.contains("校验码") || hint.contains("动态码")
-                || hint.contains("verification") || hint.contains("verifycode")
-                || hint.contains("smscode") || hint.contains("authcode")
-                || hint.contains("captcha") || hint.contains("otp")) {
+        if (normalizedHint.contains("验证码") || normalizedHint.contains("校验码")
+                || normalizedHint.contains("动态码")
+                || normalizedHint.contains("verification") || normalizedHint.contains("verifycode")
+                || normalizedHint.contains("smscode") || normalizedHint.contains("authcode")
+                || normalizedHint.contains("captcha") || normalizedHint.contains("otp")) {
             return null;
         }
-        int inputType = node.getInputType();
         //inputType 是“类别 + 变体 + 标志位”的位组合，必须按掩码取出后精确比较；
         //直接与变体常量做按位与会把多行文本等其它变体误判为密码框（如 0x50 & 0x10 命中）
         int inputClass = inputType & InputType.TYPE_MASK_CLASS;
         int variation = inputType & InputType.TYPE_MASK_VARIATION;
-        String[] autofillHints = node.getAutofillHints() != null ? node.getAutofillHints() : new String[0];
-        List<String> autofillHintList = Arrays.asList(autofillHints);
+        List<String> autofillHintList = autofillHints != null
+                ? Arrays.asList(autofillHints) : new ArrayList<>();
         // 判断输入框类型
         if (autofillHintList.contains(View.AUTOFILL_HINT_PASSWORD)
                 || (inputClass == InputType.TYPE_CLASS_TEXT
@@ -130,40 +182,40 @@ public class Type {
                     && variation == InputType.TYPE_NUMBER_VARIATION_PASSWORD)) {
             // 处理密码输入框
             return PASSWORD;
-        } else if (isUserName(hint, autofillHintList)) {
+        } else if (isUserName(normalizedHint, autofillHintList)) {
             //处理账户输入框
             return USERNAME;
         } else if (autofillHintList.contains(View.AUTOFILL_HINT_PHONE)
                 || inputClass == InputType.TYPE_CLASS_PHONE
-                || hint.contains("phone") // 判断是否为电话号码输入框
-                || hint.contains("mobile")
-                || hint.contains("手机")
-                || hint.contains("电话")) {
+                || normalizedHint.contains("phone") // 判断是否为电话号码输入框
+                || normalizedHint.contains("mobile")
+                || normalizedHint.contains("手机")
+                || normalizedHint.contains("电话")) {
             // 处理电话号码输入框
             return PHONE;
         } else if (autofillHintList.contains(View.AUTOFILL_HINT_EMAIL_ADDRESS)
                 || (inputClass == InputType.TYPE_CLASS_TEXT
                     && (variation == InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
                         || variation == InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS))
-                || hint.contains("email")
-                || hint.contains("邮箱")) {
+                || normalizedHint.contains("email")
+                || normalizedHint.contains("邮箱")) {
             // 处理邮箱输入框
             return EMAIL;
         } else if (autofillHintList.contains(View.AUTOFILL_HINT_CREDIT_CARD_NUMBER)
-                || hint.contains("bankcard")
-                || hint.contains("debitcard")
-                || hint.contains("creditcard")
-                || hint.contains("信用卡")
-                || hint.contains("银行卡")) {
+                || normalizedHint.contains("bankcard")
+                || normalizedHint.contains("debitcard")
+                || normalizedHint.contains("creditcard")
+                || normalizedHint.contains("信用卡")
+                || normalizedHint.contains("银行卡")) {
             // 处理信用卡输入框
             return CARD;
         } else if (autofillHintList.contains(View.AUTOFILL_HINT_CREDIT_CARD_SECURITY_CODE)
-                || hint.contains("cvv")
-                || hint.contains("cvc")
-                || hint.contains("csc")
-                || hint.contains("securitycode")
-                || hint.contains("安全码")
-                || hint.contains("验证号")){
+                || normalizedHint.contains("cvv")
+                || normalizedHint.contains("cvc")
+                || normalizedHint.contains("csc")
+                || normalizedHint.contains("securitycode")
+                || normalizedHint.contains("安全码")
+                || normalizedHint.contains("验证号")){
             // 处理信用卡输入框
             return CVV;
         }

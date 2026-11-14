@@ -25,6 +25,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import androidx.preference.PreferenceManager;
 
 import com.fou.passport.MyApplication;
 import com.fou.passport.R;
@@ -52,6 +53,11 @@ import java.util.function.Predicate;
 
 public class MyAutofillService2 extends AutofillService {
 
+    //跨应用通用填充最多展示的候选数量
+    private static final int MAX_GENERIC_DATASETS = 12;
+    //账号类候选上限，剩余名额留给银行卡类候选
+    private static final int MAX_GENERIC_IDENTITY_DATASETS = 8;
+
     private ResponseAdapter responseAdapter;
     private PackageDao packageDao;
     private AppExecutors appExecutors;
@@ -76,6 +82,13 @@ public class MyAutofillService2 extends AutofillService {
         List<FillContext> fillContexts = request.getFillContexts();
         List<AssistStructure> structures = fillContexts.stream().map(FillContext::getStructure).collect(toList());
         AssistStructure latestStructure = fillContexts.get(fillContexts.size() - 1).getStructure();
+        application_id = latestStructure.getActivityComponent().getPackageName();//get application_id
+        //兼容模式关闭时，不对浏览器进行自动填充
+        if (!isCompatibleModeEnabled() && BrowserHelper.isBrowser(application_id)) {
+            Log.MyAutofillService("兼容模式已关闭，跳过浏览器: " + application_id);
+            callback.onSuccess(null);
+            return;
+        }
         parser = new ClientParser(structures, latestStructure);
 
         parser.parseLastStructure(new ClientParser.NodeProcessor() {
@@ -96,20 +109,27 @@ public class MyAutofillService2 extends AutofillService {
         });
 
         responseAdapter = new ResponseAdapter(parser);
-        application_id = latestStructure.getActivityComponent().getPackageName();//get application_id
         boolean manual = (request.getFlags() & FillRequest.FLAG_MANUAL_REQUEST) != 0;//手动触发的填充请求
         //工作线程填充
         appExecutors.diskIO().execute(() -> {
             ParseWebDomain parseWebDomain = new ParseWebDomain(parser);
-            //是Web走此自动填充
-            if (parseWebDomain.isWeb()) {
+            //只有浏览器才按网址匹配数据；普通 App 内嵌的 WebView 登录页仍按 App 包名取数据
+            if (parseWebDomain.isWeb() && BrowserHelper.isBrowser(application_id)) {
                 autoFillForWebDomain(callback, parseWebDomain);
             } else {
-                //不是web走此自动填充
+                //不是浏览器走此自动填充
                 autoFillForNormalApp(callback, manual);
             }
         });
 
+    }
+
+    /**
+     * 兼容模式开关，默认开启：对浏览器进行自动填充。
+     */
+    private boolean isCompatibleModeEnabled() {
+        return PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("switch_preference_compatible_mode_enabled", true);
     }
 
     /**
@@ -124,6 +144,14 @@ public class MyAutofillService2 extends AutofillService {
             public void hasDataset(List<DatasetAndMetadata> datasetAndMetadataList) {
                 FillResponse fillResponse = responseAdapter.buildFillResponse(datasetAndMetadataList, MyAutofillService2.this);
                 //即使没有可用数据集也要回调，否则系统会一直等待填充服务响应
+                callback.onSuccess(fillResponse);
+            }
+
+            @Override
+            public void hasGenericDataset(List<DatasetAndMetadata> datasetAndMetadataList) {
+                //当前应用没有存过账户时，从其它已保存条目里提供手机号/邮箱等通用填充
+                FillResponse fillResponse = responseAdapter.buildFillResponse(datasetAndMetadataList,
+                        MyAutofillService2.this, true);
                 callback.onSuccess(fillResponse);
             }
 
@@ -402,8 +430,10 @@ public class MyAutofillService2 extends AutofillService {
     private void beginGenerateResponse(boolean manual, Begin begin) {
         //Queries the corresponding packageEntity only in database;
         PackageEntity packageEntity = packageDao.getPackageEntity(application_id, SecurityHelper.getCertificatesHash(application_id));
+        Log.MyAutofillService("fill app=" + application_id + " packageEntity=" + packageEntity);
         if (packageEntity != null) {
             List<DatasetEntity> datasetEntityList = myDB.getPackageDao().getDatasetEntityList(packageEntity.id);
+            Log.MyAutofillService("datasetEntityList=" + datasetEntityList.size());
             if (!datasetEntityList.isEmpty() && !getUsefulDatasetList(datasetEntityList).isEmpty()) {
                 //Has usefulDatasets in the corresponding packageEntity;
                 begin.hasDataset(usefulDatasetAndMetadataList);
@@ -411,6 +441,12 @@ public class MyAutofillService2 extends AutofillService {
             }
             //Delete useless packageEntity;
             packageDao.delete(packageEntity);
+        }
+        //当前应用没有存过账户：用其它已保存条目里的手机号/邮箱等作为通用填充候选
+        List<DatasetAndMetadata> genericDatasetAndMetadataList = getGenericDatasetAndMetadataList();
+        if (!genericDatasetAndMetadataList.isEmpty()) {
+            begin.hasGenericDataset(genericDatasetAndMetadataList);
+            return;
         }
         //no dataset
         begin.noDataset();
@@ -438,6 +474,103 @@ public class MyAutofillService2 extends AutofillService {
             myDB.getDatasetDao().delete(datasetEntity);
             return false;
         }).collect(toList());
+    }
+
+    /**
+     * 收集所有已保存条目中的账号类字段（用户名/手机号/邮箱），
+     * 供当前应用没有任何账户时跨应用通用填充使用。
+     * 相同的值只保留一条，避免多个应用保存同一手机号时重复弹出。
+     */
+    private List<DatasetAndMetadata> getGenericDatasetAndMetadataList() {
+        List<DatasetAndMetadata> genericList = new ArrayList<>();
+        List<DatasetAndMetadata> allDatasets = myDB.getDatasetDao().getDatasetAndMetadataList();
+        Set<String> addedValues = new HashSet<>();
+        identityLoop:
+        for (DatasetAndMetadata datasetAndMetadata : allDatasets) {
+            for (MetadataEntity metadataEntity : datasetAndMetadata.metadataEntityList) {
+                if (metadataEntity.auto_fill_type != View.AUTOFILL_TYPE_TEXT
+                        || !Type.isIdentityKey(metadataEntity.key_word)) {
+                    continue;
+                }
+                String value = metadataEntity.auto_fill_value_text;
+                if (value == null || value.trim().isEmpty()) {
+                    continue;
+                }
+                String keyWord = resolveGenericKey(metadataEntity);
+                //按统一格式去重：同一手机号的 +86/空格写法只保留一条候选
+                if (!addedValues.add(keyWord + "|" + Type.normalizeValue(value))) {
+                    continue;
+                }
+                DatasetEntity datasetEntity = new DatasetEntity(datasetAndMetadata.datasetEntity.package_id);
+                //复用原数据集 id，认证后按该 id 取回完整内容；认证页只会回填账号类字段
+                datasetEntity.id = datasetAndMetadata.datasetEntity.id;
+                DatasetAndMetadata generic = new DatasetAndMetadata();
+                generic.datasetEntity = datasetEntity;
+                generic.metadataEntityList = new ArrayList<>();
+                generic.metadataEntityList.add(new MetadataEntity(keyWord, value));
+                genericList.add(generic);
+                if (genericList.size() >= MAX_GENERIC_IDENTITY_DATASETS) {
+                    break identityLoop;
+                }
+            }
+        }
+        //银行卡类候选：卡号+CVV+开户银行合成一条，认证后回填整张卡的信息
+        Set<String> addedCards = new HashSet<>();
+        for (DatasetAndMetadata datasetAndMetadata : allDatasets) {
+            String cardValue = findCardValue(datasetAndMetadata);
+            if (cardValue == null || !addedCards.add(Type.normalizeValue(cardValue))) {
+                continue;
+            }
+            DatasetEntity datasetEntity = new DatasetEntity(datasetAndMetadata.datasetEntity.package_id);
+            //复用原数据集 id，认证后由 AuthActivity 只回填银行卡类字段
+            datasetEntity.id = datasetAndMetadata.datasetEntity.id;
+            DatasetAndMetadata generic = new DatasetAndMetadata();
+            generic.datasetEntity = datasetEntity;
+            generic.metadataEntityList = new ArrayList<>();
+            for (MetadataEntity metadataEntity : datasetAndMetadata.metadataEntityList) {
+                if (metadataEntity.auto_fill_type == View.AUTOFILL_TYPE_TEXT
+                        && Type.isCardKey(metadataEntity.key_word)
+                        && metadataEntity.auto_fill_value_text != null
+                        && !metadataEntity.auto_fill_value_text.trim().isEmpty()) {
+                    generic.metadataEntityList.add(new MetadataEntity(metadataEntity.key_word,
+                            metadataEntity.auto_fill_value_text));
+                }
+            }
+            genericList.add(generic);
+            if (genericList.size() >= MAX_GENERIC_DATASETS) {
+                break;
+            }
+        }
+        return genericList;
+    }
+
+    /**
+     * 取该账户中的银行卡号，没有则返回 null。
+     */
+    private String findCardValue(DatasetAndMetadata datasetAndMetadata) {
+        for (MetadataEntity metadataEntity : datasetAndMetadata.metadataEntityList) {
+            if (Type.CARD.equals(metadataEntity.key_word)
+                    && metadataEntity.auto_fill_type == View.AUTOFILL_TYPE_TEXT
+                    && metadataEntity.auto_fill_value_text != null
+                    && !metadataEntity.auto_fill_value_text.trim().isEmpty()) {
+                return metadataEntity.auto_fill_value_text;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 按内容判断通用填充时该值应匹配哪种页面字段。
+     */
+    private String resolveGenericKey(MetadataEntity metadataEntity) {
+        String value = metadataEntity.auto_fill_value_text;
+        if (Type.isEmailValue(value)) {
+            return Type.EMAIL;
+        }
+        if (Type.isPhoneValue(value)) {
+            return Type.PHONE;
+        }
+        return Type.isIdentityKey(metadataEntity.key_word) ? metadataEntity.key_word : Type.USERNAME;
     }
 
 
@@ -485,6 +618,11 @@ public class MyAutofillService2 extends AutofillService {
          * @param datasetAndMetadataList
          */
         void hasDataset(List<DatasetAndMetadata> datasetAndMetadataList);
+
+        /**
+         * 当前应用没有存过账户，但其它条目里有可用于通用填充的账号类字段
+         */
+        void hasGenericDataset(List<DatasetAndMetadata> datasetAndMetadataList);
 
         /**
          * There is no related package or the dataset does not meet the requirements

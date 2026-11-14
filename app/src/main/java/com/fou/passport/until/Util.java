@@ -46,7 +46,7 @@ public final class Util {
     public static final NodeFilter AUTOFILL_ID_FILTER = (node, id) ->
             id.equals(node.getAutofillId());
     private static final String TAG = "FOU";
-    public static LogLevel sLoggingLevel = LogLevel.Debug;
+    public static LogLevel sLoggingLevel = LogLevel.Off;
 
     private static void bundleToString(StringBuilder builder, Bundle data) {
         final Set<String> keySet = data.keySet();
@@ -158,7 +158,9 @@ public final class Util {
 
         int numberChildren = node.getChildCount();
         builder.append(prefix).append("# children: ").append(numberChildren)
-                .append("\ttext: ").append(node.getText())
+                //只记录长度，避免把账号密码等输入内容写进日志
+                .append("\ttext length: ")
+                .append(node.getText() == null ? 0 : node.getText().length())
                 .append('\n');
 
         final String prefix2 = prefix + "  ";

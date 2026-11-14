@@ -74,14 +74,16 @@ public class ModalBottomSheet extends BottomSheetDialogFragment {
             MyApplication.appExecutors.mainThread().execute(() -> {
                 linearProgressIndicator.hide();//隐藏进度条
                 setAdapter(applicationInfoList_adapter);//展示recyclerView列表
-                textChangeListener();//edittext的设置
+                //加载期间用户已经输入的内容，加载完成后立即生效
+                Editable currentText = textInputEditText.getText();
+                applyFilter(currentText == null ? "" : currentText.toString());
             });
         });
     }
 
 
     /**
-     * @param packageManager
+     * 监听搜索框。提前绑定，避免列表加载完成前的输入被丢弃。
      */
     private void textChangeListener() {
         textInputEditText.addTextChangedListener(new TextWatcher() {
@@ -95,28 +97,33 @@ public class ModalBottomSheet extends BottomSheetDialogFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!applicationInfoList_all.isEmpty()) {
-                    applicationInfoList_adapter.clear();//清空adapter
-                    for (ApplicationInfo applicationInfo : applicationInfoList_all) {
-                        if (applicationInfo != null) {//TODO 出现过空指针，所以加了这个
-                            String app_name = applicationInfo.loadLabel(MyApplication.applicationContext.getPackageManager()).toString();
-                            if (app_name.trim().toLowerCase().contains(s.toString().trim().toLowerCase())) {
-                                applicationInfoList_adapter.add(applicationInfo);
-                            }
-                        }
-                    }
-                    //adapter.notify
-                    if (applicationInfoList_adapter.isEmpty()) {
-                        adapter.notifyDataSetChanged();
-                        //TODO show empty view
-                    } else {
-                        //数字，字母顺序排序
-                        Collections.sort(applicationInfoList_adapter, new ApplicationInfo.DisplayNameComparator(MyApplication.applicationContext.getPackageManager()));
-                        adapter.notifyDataSetChanged();
-                    }
-                }
+                applyFilter(s == null ? "" : s.toString());
             }
         });
+    }
+
+    /**
+     * 按当前输入过滤应用列表；列表尚未加载完成时直接返回，加载完成后会再次应用当前输入。
+     */
+    private void applyFilter(String query) {
+        if (applicationInfoList_all == null || applicationInfoList_all.isEmpty()
+                || adapter == null || applicationInfoList_adapter == null) {
+            return;
+        }
+        PackageManager packageManager = MyApplication.applicationContext.getPackageManager();
+        String keyword = query.trim().toLowerCase();
+        applicationInfoList_adapter.clear();//清空adapter
+        for (ApplicationInfo applicationInfo : applicationInfoList_all) {
+            if (applicationInfo != null) {//TODO 出现过空指针，所以加了这个
+                String app_name = applicationInfo.loadLabel(packageManager).toString();
+                if (app_name.trim().toLowerCase().contains(keyword)) {
+                    applicationInfoList_adapter.add(applicationInfo);
+                }
+            }
+        }
+        //数字，字母顺序排序
+        Collections.sort(applicationInfoList_adapter, new ApplicationInfo.DisplayNameComparator(packageManager));
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -145,6 +152,8 @@ public class ModalBottomSheet extends BottomSheetDialogFragment {
         linearProgressIndicator = view.findViewById(R.id.linearProgressIndicator);
         MaterialButton button_close = view.findViewById(R.id.close);
         MaterialButton button_done = view.findViewById(R.id.done);
+        //搜索框监听要在加载应用列表之前绑定，加载期间输入的名称不会被丢掉
+        textChangeListener();
         button_close.setOnClickListener(v -> {
             dismiss();
         });

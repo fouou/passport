@@ -59,6 +59,14 @@ public class ResponseAdapter {
      * @return
      */
     public FillResponse buildFillResponse(List<DatasetAndMetadata> datasetAndMetadataList, Context context) {
+        return buildFillResponse(datasetAndMetadataList, context, false);
+    }
+
+    /**
+     * @param identityOnly 是否为跨应用通用填充（只回填账号类或银行卡类字段）
+     */
+    public FillResponse buildFillResponse(List<DatasetAndMetadata> datasetAndMetadataList, Context context,
+                                          boolean identityOnly) {
         //当前页面必须真的存在凭据输入框才展示数据集；
         //聊天框、搜索框、设置页等没有凭据字段的界面返回空，避免历史数据到处弹建议
         if (!hasCredentialField()) {
@@ -69,13 +77,14 @@ public class ResponseAdapter {
         DatasetAdapter datasetAdapter = new DatasetAdapter(clientParser, context);
         int datasetCount = 0;
             for (DatasetAndMetadata datasetAndMetadata : datasetAndMetadataList) {
-                Dataset dataset = datasetAdapter.getDataset(datasetAndMetadata);
+                Dataset dataset = datasetAdapter.getDataset(datasetAndMetadata, identityOnly);
                 if (dataset != null) {
                     builder.addDataset(dataset);
                     datasetCount++;
                 }
             }
 
+        Log.ResponseAdapter("datasetCount=" + datasetCount);
         //setSaveInfo
         SaveInfo.Builder saveInfoBuilder = getSaveInfoBuilder(context);
         if (saveInfoBuilder != null) {

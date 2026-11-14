@@ -5,6 +5,6 @@
         app:showAsAction="always"
         android:icon="@drawable/add_fill0_wght700_grad0_opsz48__1_"
         android:id="@+id/menu_listFragment_add"
-        android:title="add" >
+        android:title="@string/add" >
     </item>
 </menu>

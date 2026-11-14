@@ -2,27 +2,53 @@ plugins {
     id 'com.android.application'
 }
 
+//读取上传密钥配置（keystore.properties 不入库）
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace 'com.fou.passport'
-    compileSdk 36
+    compileSdk 37
 
     viewBinding {
         enabled = true
     }
 
     defaultConfig {
-        applicationId "com.fou.passport"
-        minSdk 26
-        targetSdk 36
-        versionCode 1
+        applicationId "com.fou.passport.autofill"
+        minSdk 24
+        targetSdk 37
+        versionCode 6
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -33,21 +59,19 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.5.0'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.preference:preference:1.2.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    //material3
-    implementation 'com.google.android.material:material:1.9.0'
     //Room
     implementation("androidx.room:room-runtime:2.5.1")
     annotationProcessor("androidx.room:room-compiler:2.5.1")
     //cipher加密
-    implementation "net.zetetic:android-database-sqlcipher:4.5.3"
-    implementation "androidx.sqlite:sqlite:2.3.1"
+    implementation "net.zetetic:sqlcipher-android:4.20.0"
+    implementation "androidx.sqlite:sqlite:2.7.0"
     //gson
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
     //okhttp
@@ -65,6 +89,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     //生物验证
     implementation 'androidx.biometric:biometric:1.2.0-alpha04'
-    //preference
-    implementation 'androidx.preference:preference:1.1.0-alpha04'
+    //左右滑动切换页面
+    implementation 'androidx.viewpager2:viewpager2:1.1.0'
 }

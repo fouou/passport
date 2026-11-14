@@ -20,6 +20,7 @@ import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 
+import com.fou.passport.R;
 import com.fou.passport.digital_asset_links.ParseWebDomain;
 import com.fou.passport.room.DatasetAndMetadata;
 import com.fou.passport.room.MetadataEntity;
@@ -35,7 +36,6 @@ public class DatasetAdapter {
     private ClientParser clientParser;
     private Context context;
     boolean isAtLeastSetValue;
-    private boolean isAtLeastSetValue1;
 
     public DatasetAdapter(ClientParser clientParser,Context context) {
         this.clientParser = clientParser;
@@ -50,13 +50,34 @@ public class DatasetAdapter {
      * Otherwise, return null.
      */
     public Dataset getDataset(DatasetAndMetadata datasetAndMetadata) {
+        return getDataset(datasetAndMetadata, false);
+    }
 
-
-
-        RemoteViews remoteViews = RemoteViewsHelper.viewsWithAuth(context.getPackageName(), getText(datasetAndMetadata));
+    /**
+     * @param datasetAndMetadata 候选数据
+     * @param identityOnly       是否为跨应用通用填充：账号类或银行卡类字段，绝不回填密码
+     */
+    public Dataset getDataset(DatasetAndMetadata datasetAndMetadata, boolean identityOnly) {
+        RemoteViews remoteViews = RemoteViewsHelper.viewsWithAuth(context.getPackageName(), getText(context, datasetAndMetadata));
+        //通用候选按内容区分：含银行卡号时只回填银行卡类字段，否则只回填账号类字段
+        int genericMode = AuthActivity.GENERIC_MODE_NONE;
+        String genericKey = null;
+        String genericValue = null;
+        if (identityOnly) {
+            genericMode = hasCardMetadata(datasetAndMetadata)
+                    ? AuthActivity.GENERIC_MODE_CARD : AuthActivity.GENERIC_MODE_IDENTITY;
+            if (genericMode == AuthActivity.GENERIC_MODE_IDENTITY
+                    && !datasetAndMetadata.metadataEntityList.isEmpty()) {
+                //把候选展示的那一条账号值传给认证页，避免同一账户有多个账号字段时填成另一个
+                MetadataEntity selected = datasetAndMetadata.metadataEntityList.get(0);
+                genericKey = selected.key_word;
+                genericValue = selected.auto_fill_value_text;
+            }
+        }
         Dataset.Builder builder = new Dataset.Builder(remoteViews)
-                .setAuthentication(AuthActivity.getAuthIntentSenderForDataset(context,datasetAndMetadata.datasetEntity.id));;
-        isAtLeastSetValue1 = false;//Initialize isAtLeastSetValue to false
+                .setAuthentication(AuthActivity.getAuthIntentSenderForDataset(context,
+                        datasetAndMetadata.datasetEntity.id, genericMode, genericKey, genericValue));
+        isAtLeastSetValue = false;//每次构建前重置，避免上一个数据集的状态污染当前数据集
         clientParser.parseLastStructure(node -> {
             if (node.getAutofillType()== View.AUTOFILL_TYPE_TEXT) {
                 autofillForEdittext(datasetAndMetadata, builder, node);//edit text
@@ -116,7 +137,9 @@ public class DatasetAdapter {
      */
     private void autofillForOtherKeyword(DatasetAndMetadata datasetAndMetadata, Dataset.Builder builder, AssistStructure.ViewNode node, String key_word) {
         for (MetadataEntity metadataEntity : datasetAndMetadata.metadataEntityList) {
-            if (!key_word.equals(Type.USERNAME) && key_word.equals(metadataEntity.key_word)) {//TODO 存储的metadata中可能会有两个相同的关键账号
+            //账号由 autofillForUsername 优先处理，这里只处理其它字段
+            if (!Type.USERNAME.equals(key_word)
+                    && key_word.equals(metadataEntity.key_word)) {//TODO 存储的metadata中可能会有两个相同的关键账号
                 if (setValueToDatasetBuilder(node, metadataEntity, builder)) {
                     isAtLeastSetValue = true;//dataset add a value
                 }
@@ -140,21 +163,33 @@ public class DatasetAdapter {
      * @param key_word node的key_word
      */
     private void autofillForUsername(DatasetAndMetadata datasetAndMetadata, Dataset.Builder builder, AssistStructure.ViewNode node, String key_word) {
-        if (key_word.equals(Type.USERNAME)){
-            List<MetadataEntity> metadataEntityList_username= datasetAndMetadata.metadataEntityList.stream().filter(metadataEntity -> Type.USERNAME.equals(metadataEntity.key_word)).collect(Collectors.toList());
-            if (!metadataEntityList_username.isEmpty()) {
-                if (setValueToDatasetBuilder(node,metadataEntityList_username.get(0) , builder)) {
+        if (!Type.USERNAME.equals(key_word)) {
+            return;
+        }
+        List<MetadataEntity> metadataEntityList_username= datasetAndMetadata.metadataEntityList.stream()
+                .filter(metadataEntity -> Type.USERNAME.equals(metadataEntity.key_word)
+                        && hasText(metadataEntity)).collect(Collectors.toList());
+        if (!metadataEntityList_username.isEmpty()) {
+            if (setValueToDatasetBuilder(node,metadataEntityList_username.get(0) , builder)) {
+                isAtLeastSetValue = true;//dataset add a value
+            }
+        }else {
+            //没有用户名时，用手机号/邮箱作为账号填充
+            List<MetadataEntity> metadataEntityList_phone_email= datasetAndMetadata.metadataEntityList.stream()
+                    .filter(metadataEntity -> hasText(metadataEntity)
+                            && (PHONE.equals(metadataEntity.key_word)
+                                || EMAIL.equals(metadataEntity.key_word))).collect(Collectors.toList());
+            if (!metadataEntityList_phone_email.isEmpty()) {
+                if (setValueToDatasetBuilder(node,metadataEntityList_phone_email.get(0) , builder)) {
                     isAtLeastSetValue = true;//dataset add a value
-                }
-            }else {
-                List<MetadataEntity> metadataEntityList_phone_email= datasetAndMetadata.metadataEntityList.stream().filter(metadataEntity -> PHONE.equals(metadataEntity.key_word) || EMAIL.equals(metadataEntity.key_word)).collect(Collectors.toList());
-                if (!metadataEntityList_phone_email.isEmpty()) {
-                    if (setValueToDatasetBuilder(node,metadataEntityList_phone_email.get(0) , builder)) {
-                        isAtLeastSetValue = true;//dataset add a value
-                    }
                 }
             }
         }
+    }
+
+    private static boolean hasText(MetadataEntity metadataEntity) {
+        return metadataEntity.auto_fill_value_text != null
+                && !metadataEntity.auto_fill_value_text.trim().isEmpty();
     }
 
 
@@ -163,7 +198,7 @@ public class DatasetAdapter {
      * @param datasetAndMetadata
      * @return 返回remoteViews中的text
      */
-    public static String getText(DatasetAndMetadata datasetAndMetadata) {
+    public static String getText(Context context, DatasetAndMetadata datasetAndMetadata) {
         List<MetadataEntity> metadataEntityList_email = datasetAndMetadata.metadataEntityList.stream().filter(metadataEntity -> USERNAME.equals(metadataEntity.key_word)).collect(Collectors.toList());
         if (!metadataEntityList_email.isEmpty()
                 && metadataEntityList_email.get(0).auto_fill_value_text != null) {
@@ -181,7 +216,42 @@ public class DatasetAdapter {
                 && metadataEntityList_account.get(0).auto_fill_value_text != null) {
             return metadataEntityList_account.get(0).auto_fill_value_text;
         }
-        return "账户";//TODO  细化
+
+        //跨应用银行卡候选只显示掩码后的卡号，避免下拉列表暴露完整卡号
+        List<MetadataEntity> metadataEntityList_card = datasetAndMetadata.metadataEntityList.stream()
+                .filter(metadataEntity -> Type.CARD.equals(metadataEntity.key_word)
+                        && hasText(metadataEntity)).collect(Collectors.toList());
+        if (!metadataEntityList_card.isEmpty()) {
+            return maskedCardNumber(metadataEntityList_card.get(0).auto_fill_value_text);
+        }
+
+        return context.getString(R.string.account);
+    }
+
+    /**
+     * 只保留卡号后四位用于候选列表展示。
+     */
+    private static String maskedCardNumber(String value) {
+        String digits = value.replace(" ", "").replace("-", "");
+        if (digits.length() > 4) {
+            return "**** " + digits.substring(digits.length() - 4);
+        }
+        return value;
+    }
+
+    /**
+     * 通用候选是否包含银行卡号，用于决定认证后只回填银行卡类字段。
+     */
+    private static boolean hasCardMetadata(DatasetAndMetadata datasetAndMetadata) {
+        if (datasetAndMetadata == null || datasetAndMetadata.metadataEntityList == null) {
+            return false;
+        }
+        for (MetadataEntity metadataEntity : datasetAndMetadata.metadataEntityList) {
+            if (Type.CARD.equals(metadataEntity.key_word)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

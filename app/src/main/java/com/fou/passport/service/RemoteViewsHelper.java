@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.fou.passport.service;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.fou.passport.R;
@@ -26,17 +27,19 @@ public final class RemoteViewsHelper {
     }
 
     public static RemoteViews viewsWithAuth(String packageName, String text) {
-        return simpleRemoteViews(packageName, text);
+        return remoteViews(packageName, text, true);
     }
 
     public static RemoteViews viewsWithNoAuth(String packageName, String text) {
-        return simpleRemoteViews(packageName, text);
+        return remoteViews(packageName, text, false);
     }
 
-    private static RemoteViews simpleRemoteViews(String packageName, String remoteViewsText) {
+    private static RemoteViews remoteViews(String packageName, String remoteViewsText, boolean authRequired) {
         RemoteViews presentation = new RemoteViews(packageName,
                 R.layout.multidataset_service_list_item);
         presentation.setTextViewText(R.id.text, remoteViewsText);
+        //需要验证身份才能取用的数据集显示副标题，普通数据集不显示
+        presentation.setViewVisibility(R.id.subtitle, authRequired ? View.VISIBLE : View.GONE);
         return presentation;
     }
 }

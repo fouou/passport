@@ -3,12 +3,17 @@ package com.fou.passport.room;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.annotation.NonNull;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+
 import com.fou.passport.MyApplication;
+import com.fou.passport.until.DbKeyStore;
 
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SupportFactory;
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory;
 
-@Database(entities = {PackageEntity.class, DatasetEntity.class,MetadataEntity.class}, version = 4, exportSchema = false)
+@Database(entities = {PackageEntity.class, DatasetEntity.class, MetadataEntity.class},
+        version = 5, exportSchema = true)
 public abstract class MyDB extends RoomDatabase {
     public abstract DatasetDao getDatasetDao();
 
@@ -18,27 +23,36 @@ public abstract class MyDB extends RoomDatabase {
 
     public static volatile MyDB myDB;
 
-    final static byte[] passphrase = SQLiteDatabase.getBytes(("userEnteredPassphrase").toCharArray());
-    final static SupportFactory factory = new SupportFactory(passphrase);
-
+    /**
+     * v4 -> v5：为账户增加软删除、删除时间与收藏标记，保证回收站与快速访问可用且不丢失旧数据。
+     */
+    public static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE dataset_entity ADD COLUMN is_deleted INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE dataset_entity ADD COLUMN deleted_at INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE dataset_entity ADD COLUMN favorite INTEGER NOT NULL DEFAULT 0");
+        }
+    };
 
     public static synchronized MyDB getDb() {
         if (myDB == null) {
+            SupportOpenHelperFactory factory = new SupportOpenHelperFactory(DbKeyStore.getPassphrase(MyApplication.applicationContext));
             myDB = Room.databaseBuilder(MyApplication.applicationContext,
                             MyDB.class, "myDatabase")
-                    //TODO Thread operate and database migrations
-                    // .allowMainThreadQueries()
-                    //.addMigrations(MIGRATION_1_2) // 添加迁移路径
-                    //.fallbackToDestructiveMigration() // 允许破坏性迁移
+                    .addMigrations(MIGRATION_4_5)
+                    //版本升级时结构变更不再直接崩溃；数据可回退重建
+                    .fallbackToDestructiveMigration()
                     .openHelperFactory(factory)
                     .build();
         }
         return myDB;
     }
 
-    public static void destroyUserAndBookDb() {
-        myDB = null;
+    public static synchronized void destroyUserAndBookDb() {
+        if (myDB != null) {
+            myDB.close();
+            myDB = null;
+        }
     }
-
-
 }

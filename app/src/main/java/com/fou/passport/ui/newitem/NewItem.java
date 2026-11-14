@@ -120,32 +120,28 @@ public class NewItem extends BaseActivity implements View.OnClickListener {
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.cancel:
-                finish();
-                break;
-            case R.id.save:
-                new MaterialAlertDialogBuilder(NewItem.this).setMessage(R.string.save).setNegativeButton(R.string.cancel, (dialog, which) -> {
-                }).setPositiveButton(R.string.save2, (dialog, which) -> {
-                    //功作线程保存
-                    MyApplication.appExecutors.diskIO().execute(this::saveData);
-                }).show();
-                break;
-            case R.id.materialTextView_appName:
-                ModalBottomSheet modalBottomSheet1 = (ModalBottomSheet) getSupportFragmentManager().findFragmentByTag(ModalBottomSheet.TAG);
-                if (modalBottomSheet1 == null) {
-                    // Fragment 尚未添加到 FragmentManager 中
-                    modalBottomSheet.show(getSupportFragmentManager(), ModalBottomSheet.TAG);
-                } else {
-                    // Fragment 已经添加到 FragmentManager 中
-                }
-                break;
-            case R.id.materialTextView_addMore:
-                if (isAdded) return;//只添加一次
-                getLayoutInflater().inflate(R.layout.newitem_add_more, binding.linearLayoutContainerNewItem, true);
-                binding.linearLayoutContainerNewItem.removeView(binding.materialTextViewAddMore);
-                isAdded = true;
-                break;
+        int viewId = v.getId();
+        if (viewId == R.id.cancel) {
+            finish();
+        } else if (viewId == R.id.save) {
+            new MaterialAlertDialogBuilder(NewItem.this).setMessage(R.string.save).setNegativeButton(R.string.cancel, (dialog, which) -> {
+            }).setPositiveButton(R.string.save2, (dialog, which) -> {
+                //功作线程保存
+                MyApplication.appExecutors.diskIO().execute(this::saveData);
+            }).show();
+        } else if (viewId == R.id.materialTextView_appName) {
+            ModalBottomSheet modalBottomSheet1 = (ModalBottomSheet) getSupportFragmentManager().findFragmentByTag(ModalBottomSheet.TAG);
+            if (modalBottomSheet1 == null) {
+                // Fragment 尚未添加到 FragmentManager 中
+                modalBottomSheet.show(getSupportFragmentManager(), ModalBottomSheet.TAG);
+            } else {
+                // Fragment 已经添加到 FragmentManager 中
+            }
+        } else if (viewId == R.id.materialTextView_addMore) {
+            if (isAdded) return;//只添加一次
+            getLayoutInflater().inflate(R.layout.newitem_add_more, binding.linearLayoutContainerNewItem, true);
+            binding.linearLayoutContainerNewItem.removeView(binding.materialTextViewAddMore);
+            isAdded = true;
         }
     }
 

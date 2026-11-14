@@ -41,17 +41,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="Password"
-                android:textSize="25sp"
-                android:textStyle="bold" />
+                android:text="@string/app_name"
+                android:textAppearance="@style/PassportPageTitle" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/linearLayout_container"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:orientation="vertical" />
+            android:nestedScrollingEnabled="false" />
         <com.google.android.material.button.MaterialButton
            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"

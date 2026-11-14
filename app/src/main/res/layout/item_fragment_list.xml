@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -27,14 +28,14 @@
             android:id="@+id/textView_appName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="passport"
+            tools:text="Passport"
             android:textStyle="bold" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textView_account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="35689987@qq.com" />
+            tools:text="user@example.com" />
     </LinearLayout>
 
     <com.google.android.material.imageview.ShapeableImageView
